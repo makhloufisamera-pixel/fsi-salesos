@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UiPath FSI Sales OS · Samera</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#080f1e;--navy2:#0d1829;--navy3:#121f35;
+  --gold:#c9a84c;--gold2:#e8c97a;--gold3:rgba(201,168,76,0.13);
+  --text:#e8e2d6;--text2:#a09a90;--text3:#5a5650;
+  --green:#3d9970;--green2:rgba(61,153,112,0.15);
+  --red:#c0392b;--red2:rgba(192,57,43,0.15);
+  --blue:#2980b9;--blue2:rgba(41,128,185,0.15);
+  --amber:#e67e22;--amber2:rgba(230,126,34,0.15);
+  --purple:rgba(155,89,182,0.15);--purplefg:#bb8fce;
+  --border:rgba(201,168,76,0.12);--border2:rgba(255,255,255,0.06);
+  --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#060d1a,#0d1829,#101e32);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:200;}
+.hdr-logo{display:flex;align-items:center;gap:10px;}
+.hdr-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hdr-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);letter-spacing:.07em;}
+.hdr-sub{font-size:10px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.hdr-badge{background:var(--gold3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:.07em;}
+
+/* API KEY BANNER */
+.apikey-bar{background:linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.06));border-bottom:2px solid var(--gold);padding:14px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.apikey-bar-icon{font-size:20px;flex-shrink:0;}
+.apikey-bar-text h3{font-size:13px;font-weight:600;color:var(--gold2);margin-bottom:2px;}
+.apikey-bar-text p{font-size:11px;color:var(--text2);}
+.apikey-bar-text a{color:var(--gold);text-decoration:none;font-size:11px;}
+.apikey-bar-text a:hover{text-decoration:underline;}
+.apikey-input-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:280px;}
+.apikey-input-wrap input{flex:1;background:#050a14;border:1.5px solid var(--gold);border-radius:8px;padding:9px 14px;font-size:12px;color:var(--text);font-family:'DM Mono',monospace;outline:none;letter-spacing:.04em;}
+.apikey-input-wrap input:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(201,168,76,.15);}
+.apikey-save-btn{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.apikey-save-btn:hover{background:var(--gold2);}
+.apikey-status{font-size:11px;font-family:'DM Mono',monospace;white-space:nowrap;}
+.status-ok{color:var(--green);}
+.status-no{color:var(--text3);}
+
+/* NAV */
+.nav{background:var(--navy2);border-bottom:1px solid var(--border2);padding:0 20px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.tab-btn{padding:13px 16px;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PANELS */
+.panel{display:none;padding:28px;}
+.panel.active{display:block;}
+
+/* TYPOGRAPHY */
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.sec-title span{color:var(--gold);}
+.sec-sub{font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:24px;}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-family:'DM Mono',monospace;margin-bottom:10px;display:block;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+@media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:18px;transition:border-color .2s;}
+.card:hover{border-color:var(--border);}
+.card-gold{background:var(--gold3);border:1px solid var(--border);}
+.card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.card p,.card li{font-size:12px;color:var(--text2);line-height:1.6;}
+.card ul{list-style:none;}
+.card ul li{padding:2px 0;}
+.card ul li::before{content:"→ ";color:var(--gold);font-size:11px;}
+
+/* RULE */
+.rule{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.rule h4{font-size:12px;font-weight:600;color:var(--gold);margin-bottom:7px;}
+.rule p,.rule li{font-size:12px;color:var(--text2);line-height:1.55;}
+.rule ul{list-style:none;}
+.rule ul li::before{content:"· ";color:var(--gold);}
+
+/* SCRIPT BLOCK */
+.script{background:#050a14;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 16px;margin:10px 0;position:relative;}
+.script-lbl{font-size:10px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:7px;}
+.script-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text);line-height:1.7;}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--gold3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Mono',monospace;transition:all .2s;}
+.copy-btn:hover{background:var(--gold);color:var(--navy);}
+
+/* FLOW */
+.flow{display:flex;gap:0;margin-bottom:22px;flex-wrap:wrap;}
+.flow-step{flex:1;min-width:100px;background:var(--navy3);border:1px solid var(--border2);padding:15px 10px;text-align:center;position:relative;transition:border-color .2s;}
+.flow-step:first-child{border-radius:8px 0 0 8px;}
+.flow-step:last-child{border-radius:0 8px 8px 0;}
+.flow-step:not(:last-child)::after{content:"›";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:18px;z-index:2;background:var(--navy);padding:0 2px;}
+.flow-step:hover{border-color:var(--border);}
+.fn{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.08em;margin-bottom:5px;}
+.fname{font-size:12px;font-weight:600;color:var(--gold);margin-bottom:3px;}
+.fdesc{font-size:10px;color:var(--text3);}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.bg{background:var(--gold3);color:var(--gold);border:1px solid var(--border);}
+.bb{background:var(--blue2);color:#5dade2;}
+.br{background:var(--red2);color:#e74c3c;}
+.ba{background:var(--amber2);color:var(--amber);}
+.bgr{background:var(--green2);color:var(--green);}
+.bp{background:var(--purple);color:var(--purplefg);}
+
+/* ACCORDION */
+.acc{border:1px solid var(--border2);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.acc-h{padding:13px 16px;background:var(--navy3);cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:500;font-size:12px;color:var(--text);transition:background .2s;user-select:none;}
+.acc-h:hover{background:#151f33;}
+.acc-arrow{color:var(--gold);font-size:16px;transition:transform .2s;flex-shrink:0;}
+.acc.open .acc-arrow{transform:rotate(90deg);}
+.acc-b{display:none;padding:14px 16px;background:var(--navy2);border-top:1px solid var(--border2);}
+.acc.open .acc-b{display:block;}
+
+/* MEDDPICC */
+.medc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.medc-card{background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:16px;border-top:3px solid var(--gold);}
+.medc-letter{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:3px;}
+.medc-name{font-size:11px;font-weight:600;color:var(--text);letter-spacing:.04em;margin-bottom:8px;}
+.medc-q{font-size:11px;color:var(--text2);margin-bottom:5px;font-style:italic;}
+.medc-ta{width:100%;background:var(--navy2);border:1px solid var(--border2);border-radius:6px;padding:7px 9px;font-size:11px;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:55px;outline:none;transition:border-color .2s;}
+.medc-ta:focus{border-color:var(--gold);}
+.score-row{display:flex;align-items:center;gap:5px;margin-top:8px;}
+.score-lbl{font-size:10px;color:var(--text3);margin-right:2px;}
+.sdot{width:22px;height:22px;border-radius:50%;border:1px solid var(--border2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);}
+.sdot:hover{border-color:var(--gold);}
+.sdot.filled{background:var(--gold);color:var(--navy);font-weight:600;border-color:var(--gold);}
+
+/* DISC */
+.disc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.dc{border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;border:2px solid transparent;}
+.dc-D{background:rgba(192,57,43,.12);}
+.dc-I{background:rgba(230,126,34,.12);}
+.dc-S{background:rgba(39,174,96,.12);}
+.dc-C{background:rgba(41,128,185,.12);}
+.dc.sel.dc-D{border-color:#e74c3c;}
+.dc.sel.dc-I{border-color:var(--amber);}
+.dc.sel.dc-S{border-color:#2ecc71;}
+.dc.sel.dc-C{border-color:#5dade2;}
+.dc-letter{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;line-height:1;margin-bottom:5px;}
+.dc-D .dc-letter{color:#e74c3c;}
+.dc-I .dc-letter{color:var(--amber);}
+.dc-S .dc-letter{color:#2ecc71;}
+.dc-C .dc-letter{color:#5dade2;}
+.dc-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.dc-sub{font-size:10px;color:var(--text3);}
+.disc-det{display:none;background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:18px;}
+.disc-det.show{display:block;}
+
+/* SPIN */
+.spin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.spin-card{background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:18px;border-left:3px solid;}
+.sp-S{border-left-color:#3498db;}
+.sp-P{border-left-color:#e74c3c;}
+.sp-I{border-left-color:var(--amber);}
+.sp-N{border-left-color:var(--green);}
+.spin-letter{font-size:30px;font-family:'Cormorant Garamond',serif;font-weight:700;margin-bottom:4px;}
+.sp-S .spin-letter{color:#3498db;}
+.sp-P .spin-letter{color:#e74c3c;}
+.sp-I .spin-letter{color:var(--amber);}
+.sp-N .spin-letter{color:var(--green);}
+.spin-card h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px;}
+.sq{background:var(--navy2);border-radius:6px;padding:9px 11px;font-size:11px;color:var(--text2);margin-bottom:5px;font-style:italic;cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+.sq:hover{background:#0d1525;border-left-color:var(--gold);color:var(--text);}
+
+/* PITCH BUILDER */
+.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.pb-step{background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:18px;}
+.pb-step h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.pb-ta{width:100%;background:var(--navy2);border:1px solid var(--border2);border-radius:6px;padding:9px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:75px;outline:none;transition:border-color .2s;}
+.pb-ta:focus{border-color:var(--gold);}
+.pitch-prev{background:#050a14;border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-top:18px;}
+.pitch-prev-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:600;}
+.pitch-prev-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--text);line-height:1.8;}
+
+/* STAT ROW */
+.srow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.slbl{font-size:12px;color:var(--text2);min-width:210px;}
+.sbar{flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.sval{font-family:'DM Mono',monospace;font-size:12px;color:var(--gold);min-width:34px;text-align:right;}
+
+/* MISC */
+.divider{height:1px;background:var(--border2);margin:20px 0;}
+.divgold{height:1px;background:var(--border);margin:18px 0;}
+.hl-box{background:var(--gold3);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin:14px 0;}
+.hl-box p{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--gold2);line-height:1.6;}
+.cl{list-style:none;}
+.cl li{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--border2);font-size:12px;color:var(--text2);}
+.cl li:last-child{border:none;}
+.cb{width:17px;height:17px;border:1px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:all .2s;background:var(--navy2);}
+.cb.chk{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.tunnel{display:flex;flex-direction:column;gap:12px;}
+.tstep{background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:18px 20px;display:flex;align-items:flex-start;gap:16px;position:relative;}
+.tstep::before{content:'';position:absolute;left:39px;bottom:-12px;width:2px;height:12px;background:var(--border);}
+.tstep:last-child::before{display:none;}
+.tnum{width:34px;height:34px;background:var(--gold3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.ttitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.tsub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.04em;margin-bottom:8px;}
+
+/* COACH */
+.coach-out{background:#050a14;border:1px solid var(--border);border-radius:var(--r);padding:20px;min-height:420px;position:relative;}
+.coach-hdr{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border2);}
+.coach-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;box-shadow:0 0 7px var(--gold);flex-shrink:0;}
+.coach-dot.active{background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse .5s infinite;}
+.coach-status{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:.1em;}
+#coach-output{font-size:12px;color:var(--text2);line-height:1.8;}
+.qbtn{padding:5px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--navy3);color:var(--text2);font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.qbtn:hover{border-color:var(--border);color:var(--text);}
+.ask-btn{width:100%;padding:13px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-top:12px;}
+.ask-btn:hover{background:var(--gold2);}
+.ask-btn:disabled{opacity:.5;cursor:not-allowed;}
+select.sel,input.inp-sm{background:var(--navy2);border:1px solid var(--border2);border-radius:6px;padding:7px 9px;font-size:11px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+select.sel:focus,input.inp-sm:focus{border-color:var(--gold);}
+textarea.ta-main{width:100%;background:var(--navy2);border:1px solid var(--border2);border-radius:6px;padding:10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:110px;outline:none;transition:border-color .2s;line-height:1.6;}
+textarea.ta-main:focus{border-color:var(--gold);}
+.disc-sel-row{display:flex;gap:6px;}
+.dsb{flex:1;padding:7px;border-radius:6px;border:1px solid var(--border2);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;outline:2px solid transparent;}
+.dsb-D{background:rgba(192,57,43,.1);color:#e74c3c;}
+.dsb-I{background:rgba(230,126,34,.1);color:var(--amber);}
+.dsb-S{background:rgba(39,174,96,.1);color:#2ecc71;}
+.dsb-C{background:rgba(41,128,185,.1);color:#5dade2;}
+.dsb-X{background:var(--navy2);color:var(--text3);}
+.dsb.picked{outline:2px solid var(--gold);}
+.hist-item{background:var(--navy3);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;cursor:pointer;transition:border-color .2s;margin-bottom:5px;}
+.hist-item:hover{border-color:var(--border);}
+.hist-item-top{font-size:10px;color:var(--gold);font-family:'DM Mono',monospace;margin-bottom:2px;}
+.hist-item-q{font-size:11px;color:var(--text2);}
+.copy-coach-btn{display:none;margin-top:12px;padding:7px 13px;background:var(--gold3);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:.04em;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--gold);color:var(--navy);padding:9px 16px;border-radius:8px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;opacity:0;transform:translateY(8px);transition:all .3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-dot"></div>
+    <div>
+      <div class="hdr-title">UiPath FSI Sales OS</div>
+      <div class="hdr-sub">Samera · RVP FSI · South Europe</div>
+    </div>
+  </div>
+  <div class="hdr-badge">v3.0 · Executive Selling + MEDDPICC + DISC + SPIN</div>
+</header>
+
+<!-- ═══════════════ API KEY BANNER ═══════════════ -->
+<div class="apikey-bar" id="apikey-bar">
+  <div class="apikey-bar-icon">🔑</div>
+  <div class="apikey-bar-text">
+    <h3>Clé API Anthropic — Requise pour le Coach IA</h3>
+    <p>Entre ta clé ci-dessous pour activer le coach. Elle est sauvegardée dans ton navigateur. &nbsp;
+      <a href="https://console.anthropic.com/settings/keys" target="_blank">Obtenir une clé gratuite →</a>
+    </p>
+  </div>
+  <div class="apikey-input-wrap">
+    <input type="password" id="api-key-field" placeholder="sk-ant-api03-xxxx..." autocomplete="off" spellcheck="false" oninput="onKeyInput()" />
+    <button class="apikey-save-btn" onclick="saveKey()">Sauvegarder</button>
+  </div>
+  <div id="key-status" class="apikey-status status-no">⬤ Non configurée</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <button class="tab-btn active" onclick="showTab(this,'dashboard')">◈ Vue Deal</button>
+  <button class="tab-btn" onclick="showTab(this,'access')">◉ Accès Exec</button>
+  <button class="tab-btn" onclick="showTab(this,'rv1')">◎ RV1 Exec</button>
+  <button class="tab-btn" onclick="showTab(this,'objections')">◆ Objections</button>
+  <button class="tab-btn" onclick="showTab(this,'meddpicc')">▣ MEDDPICC</button>
+  <button class="tab-btn" onclick="showTab(this,'disc')">◐ DISC</button>
+  <button class="tab-btn" onclick="showTab(this,'spin')">◑ SPIN</button>
+  <button class="tab-btn" onclick="showTab(this,'pitch')">◇ Value Pitch</button>
+  <button class="tab-btn" onclick="showTab(this,'salesprocess')">▷ Sales Process</button>
+  <button class="tab-btn" onclick="showTab(this,'fsiusecases')">◉ Use Cases FSI</button>
+  <button class="tab-btn" onclick="showTab(this,'platform')">◈ Platform</button>
+  <button class="tab-btn" onclick="showTab(this,'pov')">✦ POV Builder</button>
+  <button class="tab-btn" onclick="showTab(this,'personas')">◈ Personas</button>
+  <button class="tab-btn" onclick="showTab(this,'coach')" id="coach-tab-btn">✦ Coach IA</button>
+</nav>
+
+<!-- ════════════════════════ PANELS ════════════════════════ -->
+
+<!-- DASHBOARD -->
+<div id="tab-dashboard" class="panel active">
+  <div class="sec-title">Vue Deal · <span>Executive Selling</span></div>
+  <div class="sec-sub">Processus complet · UiPath FSI · South Europe</div>
+  <div class="card card-gold" style="margin-bottom:18px;">
+    <span class="lbl">Win Rate — Impact de l'Exec</span>
+    <div class="srow"><div class="slbl">Sans exec impliqué</div><div class="sbar"><div class="sfill" style="width:25%"></div></div><div class="sval">25%</div></div>
+    <div class="srow"><div class="slbl">Avec exec (1 RDV)</div><div class="sbar"><div class="sfill" style="width:65%"></div></div><div class="sval">65%</div></div>
+    <div class="srow"><div class="slbl">Exec × 2 RDVs + présentiel</div><div class="sbar"><div class="sfill" style="width:80%"></div></div><div class="sval">80%</div></div>
+  </div>
+  <span class="lbl">Structure du RV1 — Connect · Pitch · Discuss · Engage</span>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">01</div><div class="fname">CONNECT</div><div class="fdesc">Prendre la main</div></div>
+    <div class="flow-step"><div class="fn">02</div><div class="fname">PITCH</div><div class="fdesc">Partager notre vision</div></div>
+    <div class="flow-step"><div class="fn">03</div><div class="fname">DISCUSS</div><div class="fdesc">S'aligner sur la valeur</div></div>
+    <div class="flow-step"><div class="fn">04</div><div class="fname">ENGAGE</div><div class="fdesc">Faire décider</div></div>
+  </div>
+  <span class="lbl">Processus de Vente UiPath</span>
+  <div class="flow">
+    <div class="flow-step"><div class="fn">UPSIDE</div><div class="fname">DISCOVERY</div><div class="fdesc">Find Impact</div></div>
+    <div class="flow-step"><div class="fn">UPSIDE</div><div class="fname">BIZ QUAL</div><div class="fdesc">Quantify Value</div></div>
+    <div class="flow-step"><div class="fn">UPSIDE</div><div class="fname">TECH QUAL</div><div class="fdesc">Prove Impact</div></div>
+    <div class="flow-step"><div class="fn">COMMIT</div><div class="fname">PROPOSAL</div><div class="fdesc">Drive Decision</div></div>
+    <div class="flow-step"><div class="fn">COMMIT</div><div class="fname">NEGOTIATION</div><div class="fdesc">Close Strong</div></div>
+    <div class="flow-step"><div class="fn">CLOSED</div><div class="fname">WON</div><div class="fdesc">Deliver Impact</div></div>
+  </div>
+  <div class="divider"></div>
+  <span class="lbl">Les 10 Règles d'Or — FSI</span>
+  <div class="g2">
+    <div class="rule"><h4>1 · Exec d'abord — toujours</h4><p>Il faut voir l'exec. Le voir en premier. Ne pas voir que lui. On descend plus vite qu'on ne remonte.</p></div>
+    <div class="rule"><h4>2 · Insight, pas pitch produit</h4><p>L'exec veut qu'on lui dise quelque chose qu'il ne sait pas. Jamais de catalogue features. Insight + Conversation.</p></div>
+    <div class="rule"><h4>3 · La douleur de ne pas changer</h4><p>Rendre le statut quo plus douloureux que le changement. Challenger avec des questions et du storytelling.</p></div>
+    <div class="rule"><h4>4 · 5 minutes de pitch max</h4><p>Contexte → Drama → Valeur → CTA. Le reste : écoute. Ne jamais commencer par des questions de découverte.</p></div>
+    <div class="rule"><h4>5 · Silence 3" + structure objection</h4><p>Silence → Quitus → Recentrage volonté → Question fermée. Toujours traiter le QUOI avant le QUAND.</p></div>
+    <div class="rule"><h4>6 · 2 RDVs Exec = 80% win rate</h4><p>RV1 : 30min remote — évaluer l'alignement. RV1bis : 1h présentiel — l'exec est verrouillé ici, pas avant.</p></div>
+    <div class="rule"><h4>7 · TUBE — Toujours Une Bonne Excuse</h4><p>Ce n'est jamais le bon moment. La bonne question : faut-il adresser le sujet, ou pas ? Priorité = Urgent ET Important.</p></div>
+    <div class="rule"><h4>8 · Power Letter mercredi → Call lundi</h4><p>Adresse à la main, beau timbre, "Confidentiel". Horaires optimaux : avant 9h · 13h30 · 18h30.</p></div>
+    <div class="rule"><h4>9 · Drive the Deal — toujours aux manettes</h4><p>Tu proposes toujours la prochaine étape. Drive the Deal · Drive the Presentation · Drive the Negotiation.</p></div>
+    <div class="rule"><h4>10 · Mises en relation systématiques</h4><p>"Qui, parmi vos relations, serait susceptible d'être intéressé par un échange comme celui que nous avons eu ?"</p></div>
+  </div>
+  <div class="divider"></div>
+  <span class="lbl">Les Drivers de l'Executive</span>
+  <div class="g3">
+    <div class="card"><h3>⚡ Performance opérationnelle</h3><ul><li>People · Process</li><li>Innovation · Scalability</li></ul><p style="margin-top:7px;font-size:10px;color:var(--text3);">→ Liés aux KPIs</p></div>
+    <div class="card"><h3>💰 Finance</h3><ul><li>Revenue · Costs · Risks</li></ul><p style="margin-top:7px;font-size:10px;color:var(--text3);">→ Liés aux KPIs</p></div>
+    <div class="card"><h3>🔒 Personnel ← sous-représenté</h3><ul><li>Security · Reputation · Plaisir</li></ul><p style="margin-top:7px;font-size:10px;color:var(--text3);">"Prime au sommeil" · Engagé au statut quo</p></div>
+  </div>
+</div>
+
+<!-- ACCÈS EXEC -->
+<div id="tab-access" class="panel">
+  <div class="sec-title">Accès <span>Executive</span></div>
+  <div class="sec-sub">Tunnel d'engagement · Power Letter · Relance · Escalade</div>
+  <span class="lbl">Le Tunnel d'Engagement</span>
+  <div class="tunnel" style="margin-bottom:24px;">
+    <div class="tstep"><div class="tnum">1</div><div><div class="ttitle">Power Letter</div><div class="tsub">Droit de vous parler · ou Stop</div><p style="font-size:11px;color:var(--text2);">Adresse à la main · Beau timbre · "Confidentiel" · Envoi le mercredi</p></div></div>
+    <div class="tstep"><div class="tnum">2</div><div><div class="ttitle">Call de relance</div><div class="tsub">Droit de vous voir · ou Stop</div><p style="font-size:11px;color:var(--text2);">Call le lundi suivant · &lt;9h · 13h30 · 18h30 · Structure : Pitch → Discuss → Engage</p></div></div>
+    <div class="tstep"><div class="tnum">3</div><div><div class="ttitle">Meeting 1 — RV1</div><div class="tsub">Droit de vous revoir · ou Stop</div><p style="font-size:11px;color:var(--text2);">30min · Remote · Évaluer l'alignement · Obtenir le droit au RV1bis</p></div></div>
+    <div class="tstep"><div class="tnum">4</div><div><div class="ttitle">Meeting 2 — RV1bis</div><div class="tsub">Droit d'avancer · ou Stop</div><p style="font-size:11px;color:var(--text2);">1h · <strong>Présentiel obligatoire</strong> · Se projeter sur un projet · Tester l'engagement<br><span class="badge bg" style="margin-top:6px;display:inline-block;">L'exec est verrouillé ici — pas avant</span></p></div></div>
+  </div>
+  <span class="lbl">Power Letter — Template UiPath FSI</span>
+  <div class="script">
+    <div class="script-lbl">Template Power Letter</div>
+    <div class="script-txt">Monsieur / Madame [NOM],<br><br>Je vous contacte sous ce format qui sort de l'ordinaire avec un seul objectif : avoir votre totale attention au cours des 30 prochaines secondes.<br><br>[COMPTE] opère dans un contexte de transformation profonde du secteur FSI : pression réglementaire (DORA, AML), explosion des volumes de données, nécessité d'aller plus vite avec moins de ressources, et montée en puissance de l'IA comme levier de compétitivité.<br><br>Dans ce contexte, la technologie seule ne fait plus la différence. Ce qui distingue les leaders, c'est la capacité à orchestrer intelligemment leurs opérations — en connectant systèmes, agents IA et équipes dans un flux continu et auditable.<br><br>C'est précisément ce que nous faisons chez UiPath. Nos clients FSI ont réduit leurs délais opérationnels de 25-40% et libéré leurs équipes des tâches sans valeur ajoutée.<br><br>Je vous appellerai dans les prochains jours pour savoir si ce sujet a du sens chez vous — ou pas.<br><br>Bien cordialement,<br>[PRÉNOM NOM] · RVP FSI · UiPath</div>
+    <button class="copy-btn" onclick="copyScript(this)">Copier</button>
+  </div>
+  <div class="g3" style="margin-top:16px;">
+    <div class="card"><span class="lbl">Relance téléphonique</span><ul><li><strong>Pitch</strong> : Contexte + Elevator Pitch</li><li><strong>Discuss</strong> : Rentrer dans le fond</li><li><strong>Engage</strong> : Couper et proposer RDV</li></ul></div>
+    <div class="card"><span class="lbl">Escalade N+1</span><ul><li>Alignement (100h how vs 1h why)</li><li>Équité (partenariat réel)</li><li>Sécurité (intérêt de tous)</li><li>Contournement si blocage</li></ul></div>
+    <div class="card"><span class="lbl">Mise en relation</span><p style="font-style:italic;color:var(--gold2);font-family:'Cormorant Garamond',serif;font-size:13px;">"Qui, parmi vos relations, serait susceptible d'être intéressé par un échange comme celui que nous avons eu ensemble ?"</p></div>
+  </div>
+</div>
+
+<!-- RV1 -->
+<div id="tab-rv1" class="panel">
+  <div class="sec-title">RV1 <span>Executive</span></div>
+  <div class="sec-sub">Connect · Pitch · Discuss · Engage · Scripts complets</div>
+  <div class="card card-gold" style="margin-bottom:16px;">
+    <span class="lbl">Ce que l'Exec attend du 1er RV</span>
+    <div class="g3">
+      <div><p style="font-weight:600;color:var(--gold);margin-bottom:4px;">Insight</p><p>Dites-moi quelque chose que je ne sais pas. Pas une présentation produit.</p></div>
+      <div><p style="font-weight:600;color:var(--gold);margin-bottom:4px;">Impact Business</p><p>Parlez de quelque chose qui impacte MON business, pas votre roadmap.</p></div>
+      <div><p style="font-weight:600;color:var(--gold);margin-bottom:4px;">Conversation</p><p>Je ne veux pas une présentation mais une conversation. Posez des questions intelligentes.</p></div>
+    </div>
+  </div>
+  <div class="acc open">
+    <div class="acc-h" onclick="togAcc(this)"><span><span class="badge bb" style="margin-right:7px;">01 CONNECT</span>Script d'ouverture</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b">
+      <div class="g2">
+        <div>
+          <span class="lbl">Check-list CONNECT</span>
+          <ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Ponctualité — arriver 5 min avant</li><li><div class="cb" onclick="togCb(this)"></div>Tenue adaptée</li><li><div class="cb" onclick="togCb(this)"></div>Contact visuel dès l'entrée</li><li><div class="cb" onclick="togCb(this)"></div>Matériel prêt (pas de setup)</li><li><div class="cb" onclick="togCb(this)"></div>Agenda préparé en tête</li><li><div class="cb" onclick="togCb(this)"></div>Énergie et conviction incarnées</li></ul>
+        </div>
+        <div>
+          <div class="script"><div class="script-lbl">Script d'ouverture</div><div class="script-txt">"Je suis heureux que nous ayons réussi à concilier nos agendas.<br><br>[Se présenter] Mon rôle chez UiPath est d'accompagner des dirigeants comme vous dans leur réflexion sur la transformation opérationnelle du secteur FSI.<br><br>Je vous propose de prendre 5 minutes pour partager notre lecture des enjeux en matière d'automatisation et d'IA dans votre secteur.<br><br>Ensuite, nous aurons tout le reste de l'entretien pour discuter et voir si cela a du sens chez vous… ou pas d'ailleurs.<br><br>Est-ce que cela vous convient ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)"><span><span class="badge ba" style="margin-right:7px;">02 PITCH</span>Context → Drama → Value · 5 min max</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b">
+      <div class="g3" style="margin-bottom:12px;">
+        <div class="card"><span class="lbl">Contexte</span><p>Lecture rapide, caricaturale, disruptive du marché FSI. "Nous sommes dans un monde où…"</p></div>
+        <div class="card"><span class="lbl">Drama</span><p>"En fait, le vrai sujet, c'est…" Cash, direct, provocateur. La douleur de ne pas bouger.</p></div>
+        <div class="card"><span class="lbl">Value + CTA</span><p>"Ce qui fait la différence avec nous, c'est que…" → "Quelle est votre réaction ?"</p></div>
+      </div>
+      <div class="script"><div class="script-lbl">Pitch UiPath FSI</div><div class="script-txt">"[CONTEXTE] Le secteur FSI vit une transformation sans précédent : DORA, inflation des coûts, pression sur les marges, et une IA qui promet tout — mais sans orchestration, elle ne livre rien.<br><br>[DRAMA] Le vrai sujet, c'est que la plupart des grandes organisations FSI ont massivement investi en IA et digitalisation — mais leurs processus restent fragmentés, leurs systèmes ne se parlent pas, et leurs équipes passent encore 40% de leur temps sur des tâches sans valeur. Le risque : aller vite dans la mauvaise direction.<br><br>[VALUE] Ce que nous faisons chez UiPath — et ce que personne d'autre ne fait à cette échelle — c'est orchestrer l'ensemble : robots, agents IA, humains, systèmes legacy. Nos clients FSI ont réduit leurs délais de traitement de 25-40% et libéré leurs équipes.<br><br>[CTA] Quelle est votre réaction à ce que je viens de partager ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+    </div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)"><span><span class="badge bg" style="margin-right:7px;">03 DISCUSS</span>Challenger le statut quo · Questions clés</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b">
+      <div class="g2">
+        <div>
+          <div class="sq" onclick="copyQ(this)">"Pendant combien de temps pensez-vous pouvoir continuer sans rien changer ?"</div>
+          <div class="sq" onclick="copyQ(this)">"Si vous deviez repartir d'une page blanche, choisiriez-vous les outils que vous avez actuellement ?"</div>
+          <div class="sq" onclick="copyQ(this)">"Que pensez-vous que vos concurrents font actuellement sur ce sujet ?"</div>
+          <div class="sq" onclick="copyQ(this)">"À combien chiffrez-vous le temps que vos équipes passent à contourner les failles du système actuel ?"</div>
+        </div>
+        <div>
+          <div class="sq" onclick="copyQ(this)">"Et si demain un nouvel actionnaire vous challenge sur le sujet, comment justifier le statu quo ?"</div>
+          <div class="sq" onclick="copyQ(this)">"Comment pensez-vous attirer et retenir les meilleurs talents avec l'organisation actuelle ?"</div>
+          <div class="sq" onclick="copyQ(this)">"Quelle est votre feuille de route sur ce sujet ?" [1:1 · contexte off — obligatoire]</div>
+          <div class="sq" onclick="copyQ(this)">"Pourquoi avez-vous accepté cette réunion ?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)"><span><span class="badge bgr" style="margin-right:7px;">04 ENGAGE</span>Conclure RV1 · Obtenir droit au RV2</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b">
+      <div class="g3" style="margin-bottom:12px;">
+        <div class="card card-gold" style="text-align:center;"><div style="font-size:28px;margin-bottom:6px;">?</div><span class="lbl">Question 1</span><p>"Est-ce que c'est <strong>clair</strong> ?"</p></div>
+        <div class="card card-gold" style="text-align:center;"><div style="font-size:28px;margin-bottom:6px;">?</div><span class="lbl">Question 2</span><p>"Cela a du <strong>sens</strong> ?"</p></div>
+        <div class="card card-gold" style="text-align:center;"><div style="font-size:28px;margin-bottom:6px;">?</div><span class="lbl">Question 3</span><p>"Vous voulez <strong>avancer</strong> ?"</p></div>
+      </div>
+      <div class="script"><div class="script-lbl">Script conclusion RV1 + demande RV2</div><div class="script-txt">"Avant que nous nous séparions, trois questions directes.<br>Est-ce que ce que nous avons échangé vous semble clair ?<br>Est-ce que cela a du sens dans votre contexte actuel ?<br>Et si c'est le cas — voulez-vous qu'on aille plus loin ensemble ?<br><br>[Si oui :] Je vous propose qu'on se retrouve — en présentiel — pour rentrer dans le concret. 1 heure suffit. Quand êtes-vous disponible dans les deux prochaines semaines ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- OBJECTIONS -->
+<div id="tab-objections" class="panel">
+  <div class="sec-title"><span>Objections</span> — Scripts Complets</div>
+  <div class="sec-sub">Silence 3" → Quitus → Recentrage → Question fermée "…ou pas ?"</div>
+  <div class="card card-gold" style="margin-bottom:16px;">
+    <span class="lbl">Structure universelle</span>
+    <div class="g4">
+      <div><div style="font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">01</div><p style="font-weight:600;font-size:12px;color:var(--text);margin-bottom:3px;">Silence 3"</p><p>Laisser exister l'objection. Signal de solidité.</p></div>
+      <div><div style="font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">02</div><p style="font-weight:600;font-size:12px;color:var(--text);margin-bottom:3px;">Quitus</p><p>Empathie — valider sans céder. "Évidemment…"</p></div>
+      <div><div style="font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">03</div><p style="font-weight:600;font-size:12px;color:var(--text);margin-bottom:3px;">Recentrage</p><p>Assertivité — revenir sur la volonté, pas l'obstacle.</p></div>
+      <div><div style="font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">04</div><p style="font-weight:600;font-size:12px;color:var(--text);margin-bottom:3px;">Question fermée</p><p>Toujours terminer par "…ou pas ?"</p></div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);"><p style="font-size:12px;color:var(--gold2);font-family:'Cormorant Garamond',serif;font-style:italic;">Executive = Pouvoir. Toujours traiter le QUOI avant le QUAND. Budget/timing/compétences/N-1 sont tous des prétextes — l'exec peut les résoudre s'il veut vraiment avancer.</p></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid #e74c3c;"><span><span class="badge br" style="margin-right:7px;">BUDGET</span>"Je n'ai pas le budget…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b"><div class="script"><div class="script-lbl">Script — Pas de budget</div><div class="script-txt">"Évidemment, les budgets sont votés en fin d'année et les règles de bonne gestion imposent de les respecter. Et j'imagine que vous êtes le premier à rappeler ces principes à vos équipes.<br><br>Maintenant, comment cela se passe chez vous ? C'est le budget qui détermine toutes vos décisions, ou bien vous avez la souplesse pour saisir les opportunités ou faire face aux urgences ?<br><br>Autrement dit, si vous décidez d'adresser le sujet, je suis convaincu que vous trouverez le budget d'ici quelques semaines, au moins pour lancer le projet. Et si vous ne souhaitez pas l'adresser, la question ne se pose plus.<br><br>Du coup, je vous pose la question : avez-vous l'intention d'adresser le sujet, ou pas ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid var(--amber);"><span><span class="badge ba" style="margin-right:7px;">TIMING · TUBE</span>"Ce n'est pas le bon moment…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b"><div class="script"><div class="script-lbl">Script — Pas le bon moment (TUBE)</div><div class="script-txt">"Le choix du timing est évidemment crucial. Et compte-tenu de l'actualité récente, il est logique que vous vous disiez qu'il vaut mieux attendre.<br><br>Le problème, c'est que ce n'est jamais le bon moment. Ce n'est pas le bon moment aujourd'hui, ce n'était pas le bon moment il y a un an, et je vous mets mon billet que dans un an il y aura à nouveau une bonne raison de se dire la même chose.<br><br>En réalité, ce n'est pas la bonne question. La bonne question est de savoir s'il faut ou pas adresser ce sujet. Si la réponse est oui, alors il faut acter cette volonté et se poser la question du timing. Si la réponse est non, alors le sujet du timing est réglé.<br><br>Alors je vous pose la question : selon vous, ce sujet, dans votre entreprise, il faut l'adresser, ou pas ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid #9b59b6;"><span><span class="badge bp" style="margin-right:7px;">BANDE PASSANTE</span>"Je n'ai pas la bande passante…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b"><div class="script"><div class="script-lbl">Script — Pas de bande passante</div><div class="script-txt">"Évidemment, tout le monde travaille en flux tendu, il n'y a plus de mou dans les entreprises.<br><br>Maintenant, comment cela se passe chez vous ? Ce sont les ressources disponibles qui déterminent les priorités, ou bien les priorités qui déterminent l'allocation des ressources ?<br><br>Autrement dit, si vous décidez d'adresser le sujet, je suis convaincu que vous trouverez les ressources d'ici quelques semaines. Et si vous ne souhaitez pas l'adresser, la question ne se pose plus.<br><br>Du coup, je vous pose la question : avez-vous l'intention d'adresser le sujet, ou pas ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid #3498db;"><span><span class="badge bb" style="margin-right:7px;">COMPÉTENCES</span>"Je n'ai pas les compétences…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b"><div class="script"><div class="script-lbl">Script — Pas les compétences</div><div class="script-txt">"Évidemment, c'est précisément parce que vous n'avez pas les compétences que vous n'avez pas traité le sujet jusqu'à présent. On parle de compétences très pointues et pour une période transitoire.<br><br>Maintenant, ce sont les compétences disponibles qui déterminent les priorités, ou bien les priorités qui déterminent l'accès aux compétences nécessaires ?<br><br>Si vous décidez d'adresser le sujet, je suis convaincu que vous trouverez les compétences d'ici quelques semaines. Et si vous ne souhaitez pas l'adresser, la question ne se pose plus.<br><br>Du coup : avez-vous l'intention d'adresser le sujet, ou pas ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid var(--green);"><span><span class="badge bgr" style="margin-right:7px;">N-1</span>"Voyez cela avec mon N-1…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b"><div class="script"><div class="script-lbl">Script — Renvoi au N-1</div><div class="script-txt">"Évidemment, lorsque nous allons aborder les aspects opérationnels, nous allons travailler avec lui. Il est compétent et aura du temps pour cela contrairement à vous. Vous n'êtes pas là pour rentrer dans le détail mais pour donner les impulsions.<br><br>Maintenant, qui va prendre la décision d'allouer de la bande passante pour explorer le sujet dont nous parlons ?<br><br>Si vous décidez de creuser le sujet, nous allons avancer avec lui. Et si vous ne souhaitez pas creuser, inutile de lui faire perdre du temps — et à nous non plus.<br><br>Du coup : souhaitez-vous creuser le sujet, ou pas ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+  </div>
+  <div class="acc">
+    <div class="acc-h" onclick="togAcc(this)" style="border-left:3px solid #1abc9c;"><span><span class="badge" style="background:rgba(26,188,156,.15);color:#1abc9c;margin-right:7px;">PRIORITÉ</span>"Ce n'est pas une priorité…"</span><span class="acc-arrow">›</span></div>
+    <div class="acc-b">
+      <div class="g2" style="margin-bottom:10px;">
+        <div class="card card-gold"><p style="font-weight:600;color:var(--gold);margin-bottom:3px;">PRIORITÉ =</p><p style="font-size:15px;font-family:'Cormorant Garamond',serif;">Urgent ET Important</p></div>
+        <div class="card card-gold"><p style="font-weight:600;color:#e74c3c;margin-bottom:3px;">PAS UNE PRIORITÉ =</p><p style="font-size:15px;font-family:'Cormorant Garamond',serif;">Pas urgent OU Pas important</p></div>
+      </div>
+      <div class="script"><div class="script-lbl">Script — Ce n'est pas une priorité</div><div class="script-txt">"Vous voulez dire que vous ne voulez pas adresser le sujet… ou que vous ne voulez pas l'adresser maintenant ?<br><br>[Si pas maintenant :] La bonne question : si c'est important, pourquoi pas maintenant ? → TUBE<br><br>[Si pas du tout :] Je vous remercie de la franchise. Est-ce qu'il y a quelque chose que je n'ai pas compris dans votre situation qui expliquerait que ce sujet ne soit pas pertinent pour vous ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MEDDPICC -->
+<div id="tab-meddpicc" class="panel">
+  <div class="sec-title"><span>MEDDPICC</span> — Deal Qualifier</div>
+  <div class="sec-sub">Score ton deal · 1-3 étoiles par dimension · 21 points max</div>
+  <div class="card card-gold" style="margin-bottom:16px;"><p style="font-size:12px;color:var(--text2);">Remplis chaque dimension. Score 19-21 = Deal béton. 15-18 = Solide. 8-14 = En construction. 0-7 = Non qualifié.</p></div>
+  <div class="medc-grid">
+    <div class="medc-card"><div class="medc-letter">M</div><div class="medc-name">Metrics — Valeur mesurable</div><div class="medc-q">"Quels KPIs ce projet va-t-il améliorer ? De combien ?"</div><textarea class="medc-ta" placeholder="ROI · Réduction coûts · Gain de temps · NPS · Réduction risques..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">E</div><div class="medc-name">Economic Buyer — Décideur financier</div><div class="medc-q">"Qui signe ? Ai-je accès direct à lui ?"</div><textarea class="medc-ta" placeholder="Nom · Titre · Accès direct/indirect · Alignement..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">D</div><div class="medc-name">Decision Criteria — Critères de décision</div><div class="medc-q">"Sur quels critères vont-ils choisir ?"</div><textarea class="medc-ta" placeholder="Critères officiels vs informels · Nos forces vs faiblesses..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">D</div><div class="medc-name">Decision Process — Processus de décision</div><div class="medc-q">"Comment ils décident ? Quel calendrier ?"</div><textarea class="medc-ta" placeholder="Étapes · Comités · Véto · Date de décision..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">I</div><div class="medc-name">Identify Pain — Douleur identifiée</div><div class="medc-q">"Quelle est la vraie douleur ? Reconnue au niveau exec ?"</div><textarea class="medc-ta" placeholder="Douleur business · Reconnue par qui · Chiffrée · Urgence..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">C</div><div class="medc-name">Champion — Notre défenseur interne</div><div class="medc-q">"Qui défend UiPath quand on n'est pas dans la pièce ?"</div><textarea class="medc-ta" placeholder="Nom · Rôle · Motivation personnelle · Influence réelle..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card"><div class="medc-letter">C</div><div class="medc-name">Competition — Concurrence</div><div class="medc-q">"Qui d'autre est en lice ? Notre position ?"</div><textarea class="medc-ta" placeholder="AA · Power Automate · Pega · Build interne · Notre différentiation..."></textarea><div class="score-row"><div class="score-lbl">Score</div><div class="sdot" onclick="setScore(this,1)">1</div><div class="sdot" onclick="setScore(this,2)">2</div><div class="sdot" onclick="setScore(this,3)">3</div></div></div>
+    <div class="medc-card" style="border-top-color:var(--green);background:var(--green2);"><div class="medc-letter" style="color:var(--green);">∑</div><div class="medc-name">Score Global</div><div style="font-size:38px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--green);text-align:center;margin:12px 0;" id="total-score">0/21</div><div id="score-label" style="text-align:center;font-size:11px;color:var(--text3);">Remplis les 7 dimensions</div><div class="rule" style="margin-top:12px;"><h4>Lecture</h4><ul><li>0-7 : Non qualifié — stop</li><li>8-14 : En construction</li><li>15-18 : Solide — accélérer</li><li>19-21 : Béton — closer</li></ul></div></div>
+  </div>
+</div>
+
+<!-- DISC -->
+<div id="tab-disc" class="panel">
+  <div class="sec-title">DISC <span>Adapter</span></div>
+  <div class="sec-sub">Adapter ton style au profil de l'exec · Clique sur le profil dominant</div>
+  <div class="disc-grid">
+    <div class="dc dc-D" onclick="showDisc(this,'D')"><div class="dc-letter">D</div><div class="dc-name">Dominant</div><div class="dc-sub">Résultats · Direct · Contrôle</div></div>
+    <div class="dc dc-I" onclick="showDisc(this,'I')"><div class="dc-letter">I</div><div class="dc-name">Influent</div><div class="dc-sub">Enthousiaste · Social · Persuasif</div></div>
+    <div class="dc dc-S" onclick="showDisc(this,'S')"><div class="dc-letter">S</div><div class="dc-name">Stable</div><div class="dc-sub">Patient · Loyal · Processus</div></div>
+    <div class="dc dc-C" onclick="showDisc(this,'C')"><div class="dc-letter">C</div><div class="dc-name">Consciencieux</div><div class="dc-sub">Analytique · Précis · Qualité</div></div>
+  </div>
+  <div id="disc-D" class="disc-det"><div class="g2"><div><span class="lbl" style="color:#e74c3c;">D — Dominant · Profil Résultats</span><div class="rule"><h4>Ce qu'il veut</h4><ul><li>ROI direct et chiffré dès le départ</li><li>Avantage compétitif concret</li><li>Timeline courte et réaliste</li><li>Références : qui d'autre comme lui</li></ul></div><div class="rule"><h4>À éviter</h4><ul><li>Trop de détails techniques</li><li>Questions de découverte en ouverture</li><li>Hésitations ou manque de conviction</li></ul></div></div><div><div class="script"><div class="script-lbl">Opening D</div><div class="script-txt">"Droit au but : vos concurrents [NOMS] ont réduit leurs coûts opérationnels de 30% en 18 mois avec nous. Vous pouvez faire pareil — ou mieux. Je vous propose de vous montrer comment en 5 minutes."</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div><div class="script"><div class="script-lbl">Challenger D</div><div class="script-txt">"Pendant combien de temps pensez-vous que vos concurrents vont vous attendre pour adresser ce sujet ?"</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div></div></div>
+  <div id="disc-I" class="disc-det"><div class="g2"><div><span class="lbl" style="color:var(--amber);">I — Influent · Profil Enthousiaste</span><div class="rule"><h4>Ce qu'il veut</h4><ul><li>Vision inspirante et excitante</li><li>Reconnaissance de son rôle de leader</li><li>"Vous seriez parmi les premiers à…"</li><li>Stories et exemples concrets</li></ul></div></div><div><div class="script"><div class="script-lbl">Opening I</div><div class="script-txt">"Vous avez positionné [COMPTE] comme un leader digital FSI — et ce que vous faites est exactement ce que les meilleurs font. Je voudrais vous partager comment amplifier encore cet avantage."</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div></div></div>
+  <div id="disc-S" class="disc-det"><div class="g2"><div><span class="lbl" style="color:#2ecc71;">S — Stable · Profil Processus</span><div class="rule"><h4>Ce qu'il veut</h4><ul><li>Sécurité et faible risque</li><li>Accompagnement tout au long</li><li>Preuves : études de cas similaires</li><li>Plan progressif et structuré</li></ul></div></div><div><div class="script"><div class="script-lbl">Opening S</div><div class="script-txt">"Nous avons accompagné [RÉFÉRENCE] dans une transformation similaire — avec une approche progressive qui leur a permis de sécuriser chaque étape avant de passer à la suivante."</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div></div></div>
+  <div id="disc-C" class="disc-det"><div class="g2"><div><span class="lbl" style="color:#5dade2;">C — Consciencieux · Profil Analytique</span><div class="rule"><h4>Ce qu'il veut</h4><ul><li>Données précises et vérifiables</li><li>Méthodologie rigoureuse</li><li>Preuves de concept documentées</li><li>Transparence sur les limites</li></ul></div></div><div><div class="script"><div class="script-lbl">Opening C</div><div class="script-txt">"J'ai préparé des données spécifiques à votre secteur et taille d'organisation. Si vous avez des questions ou doutes sur ce que j'avance, je vous encourage à les soulever immédiatement."</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div></div></div>
+</div>
+
+<!-- SPIN -->
+<div id="tab-spin" class="panel">
+  <div class="sec-title">SPIN <span>Selling</span></div>
+  <div class="sec-sub">Situation · Problem · Implication · Need-Payoff · Adapté FSI UiPath · Cliquer pour copier</div>
+  <div class="spin-grid">
+    <div class="spin-card sp-S"><div class="spin-letter">S</div><h3>Situation — Comprendre le contexte</h3><p style="font-size:10px;color:var(--text3);margin-bottom:8px;">Établir les faits. Ne pas en abuser — préparer en amont via LinkedIn/RA.</p><div class="sq" onclick="copyQ(this)">"Comment gérez-vous actuellement vos processus de [sinistres / souscription / crédit / conformité] ?"</div><div class="sq" onclick="copyQ(this)">"Quels systèmes utilisez-vous pour orchestrer ces opérations ?"</div><div class="sq" onclick="copyQ(this)">"Combien d'équipes sont impliquées dans ce processus de bout en bout ?"</div><div class="sq" onclick="copyQ(this)">"Quelles sont vos priorités de transformation pour les 12-18 prochains mois ?"</div><div class="sq" onclick="copyQ(this)">"Où en êtes-vous dans votre programme DORA / conformité réglementaire ?"</div></div>
+    <div class="spin-card sp-P"><div class="spin-letter">P</div><h3>Problem — Identifier les douleurs</h3><p style="font-size:10px;color:var(--text3);margin-bottom:8px;">Faire exprimer les difficultés implicites.</p><div class="sq" onclick="copyQ(this)">"Quelles sont vos principales frustrations avec votre organisation actuelle ?"</div><div class="sq" onclick="copyQ(this)">"Dans quelle mesure vos systèmes actuels vous permettent d'aller à la vitesse du marché ?"</div><div class="sq" onclick="copyQ(this)">"Est-ce que les délais de traitement sont conformes à vos objectifs de service client ?"</div><div class="sq" onclick="copyQ(this)">"Quelle est la part de travail manuel encore présente dans vos opérations core ?"</div><div class="sq" onclick="copyQ(this)">"Où sont vos principaux points de rupture dans la chaîne de traitement ?"</div></div>
+    <div class="spin-card sp-I"><div class="spin-letter">I</div><h3>Implication — Amplifier la douleur</h3><p style="font-size:10px;color:var(--text3);margin-bottom:8px;">Les questions les plus puissantes. Coût réel de l'inaction.</p><div class="sq" onclick="copyQ(this)">"Quel est l'impact de ces délais sur votre NPS et votre taux de rétention client ?"</div><div class="sq" onclick="copyQ(this)">"Si ce problème n'est pas résolu dans 12 mois, quelle est la conséquence sur vos objectifs ?"</div><div class="sq" onclick="copyQ(this)">"Quel est le coût annuel estimé de ces processus manuels — en temps, erreurs, reprises ?"</div><div class="sq" onclick="copyQ(this)">"Comment cette situation influence votre capacité à répondre à DORA ?"</div><div class="sq" onclick="copyQ(this)">"Si vos concurrents résolvent ce problème avant vous, quel est l'impact sur votre part de marché ?"</div><div class="sq" onclick="copyQ(this)">"Comment cela affecte votre capacité à attirer et retenir les meilleurs talents ?"</div></div>
+    <div class="spin-card sp-N"><div class="spin-letter">N</div><h3>Need-Payoff — Faire exprimer la valeur</h3><p style="font-size:10px;color:var(--text3);margin-bottom:8px;">L'exec se convainc lui-même — le plus puissant des closings.</p><div class="sq" onclick="copyQ(this)">"Si vous pouviez réduire ce délai de traitement de 80%, quel serait l'impact sur votre P&L ?"</div><div class="sq" onclick="copyQ(this)">"En quoi une plateforme qui connecte tous vos systèmes en temps réel changerait votre opérationnel ?"</div><div class="sq" onclick="copyQ(this)">"Si vos équipes se concentraient à 100% sur des décisions à valeur — qu'est-ce que cela représente ?"</div><div class="sq" onclick="copyQ(this)">"Qu'est-ce que cela représenterait pour vous personnellement d'avoir livré ce projet dans les délais ?"</div></div>
+  </div>
+</div>
+
+<!-- VALUE PITCH BUILDER -->
+<div id="tab-pitch" class="panel">
+  <div class="sec-title">Value Pitch <span>Builder</span></div>
+  <div class="sec-sub">Context → Drama → Value → CTA · 5 minutes max en RV · Jamais de slides produit</div>
+  <div class="pb-grid">
+    <div class="pb-step"><span class="lbl">01 · Contexte</span><h3>Lecture du marché</h3><p style="font-size:11px;color:var(--text3);margin-bottom:8px;">Rapide, caricatural, disruptif. "Nous sommes dans un monde où…"</p><textarea class="pb-ta" id="p1" oninput="buildPitch()"></textarea></div>
+    <div class="pb-step"><span class="lbl">02 · Drama</span><h3>Le vrai sujet — cash et direct</h3><p style="font-size:11px;color:var(--text3);margin-bottom:8px;">"En fait, le vrai sujet c'est…" La douleur de ne pas changer.</p><textarea class="pb-ta" id="p2" oninput="buildPitch()"></textarea></div>
+    <div class="pb-step"><span class="lbl">03 · Value</span><h3>Notre différentiation</h3><p style="font-size:11px;color:var(--text3);margin-bottom:8px;">"Ce qui fait la différence, c'est que nous…" Impact, pas features.</p><textarea class="pb-ta" id="p3" oninput="buildPitch()"></textarea></div>
+    <div class="pb-step"><span class="lbl">04 · Call to Action</span><h3>Ouvrir la conversation</h3><p style="font-size:11px;color:var(--text3);margin-bottom:8px;">Toujours une question ouverte. "Quelle est votre réaction ?"</p><textarea class="pb-ta" id="p4" oninput="buildPitch()"></textarea></div>
+  </div>
+  <div class="pitch-prev"><div class="pitch-prev-title">Aperçu du Pitch</div><div class="pitch-prev-txt" id="pitch-out"><span style="color:var(--text3);font-style:normal;font-size:11px;">Remplis les 4 blocs ci-dessus...</span></div><br><button class="copy-btn" style="position:static;" onclick="copyPitch()">Copier le pitch complet</button></div>
+</div>
+
+<!-- SALES PROCESS -->
+<div id="tab-salesprocess" class="panel">
+  <div class="sec-title">Sales Process <span>UiPath</span></div>
+  <div class="sec-sub">6 Stages officiels · Discovery → Closed Won</div>
+  <div class="flow" style="margin-bottom:24px;">
+    <div class="flow-step"><div class="fn">UPSIDE</div><div class="fname">DISCOVERY</div><div class="fdesc">Find Impact</div></div>
+    <div class="flow-step"><div class="fn">UPSIDE/PROB</div><div class="fname">BIZ QUAL</div><div class="fdesc">Quantify Value</div></div>
+    <div class="flow-step"><div class="fn">UPSIDE</div><div class="fname">TECH QUAL</div><div class="fdesc">Prove Impact</div></div>
+    <div class="flow-step"><div class="fn">COMMIT</div><div class="fname">PROPOSAL</div><div class="fdesc">Drive Decision</div></div>
+    <div class="flow-step"><div class="fn">COMMIT</div><div class="fname">NEGOTIATION</div><div class="fdesc">Close Strong</div></div>
+    <div class="flow-step"><div class="fn">CLOSED</div><div class="fname">WON</div><div class="fdesc">Deliver Impact</div></div>
+  </div>
+  <div class="acc open"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bb" style="margin-right:7px;">01 DISCOVERY · Upside</span>Find Impact, Build Trust</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Identifier high-impact automation use cases</li><li><div class="cb" onclick="togCb(this)"></div>Vérifier budget et timeline</li><li><div class="cb" onclick="togCb(this)"></div>Comprendre les business goals globaux</li><li><div class="cb" onclick="togCb(this)"></div>Capturer MEDDPICC initial</li><li><div class="cb" onclick="togCb(this)"></div>Identifier Champion + Competition</li><li><div class="cb" onclick="togCb(this)"></div>Engager stakeholders techniques tôt</li></ul></div><div><div class="rule"><h4>Verifiable Outcomes</h4><ul><li>Alignement sur les pain points</li><li>Intérêt confirmé pour UiPath</li><li>Commitment to invest time</li></ul></div><div class="rule"><h4>Best Practice</h4><p>Multi-level discovery : exec + opérationnel + tech. Aligner la douleur avec les business goals de haut niveau.</p></div></div></div></div></div>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge ba" style="margin-right:7px;">02 BIZ QUAL · Upside/Probable</span>Quantify Value, Secure Buy-in</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Confirmer budget et timeline</li><li><div class="cb" onclick="togCb(this)"></div>Modéliser ROI et présenter business case</li><li><div class="cb" onclick="togCb(this)"></div>Initier Mutual Action Plan</li><li><div class="cb" onclick="togCb(this)"></div>Réaliser démos initiales</li><li><div class="cb" onclick="togCb(this)"></div>Identifier et engager l'Economic Buyer</li><li><div class="cb" onclick="togCb(this)"></div>Confirmer Decision Criteria + Metrics</li></ul></div><div><div class="rule"><h4>Verifiable Outcomes</h4><ul><li>Aligné sur use cases + ROI</li><li>Budget confirmé</li><li>Decision process et timeline compris</li><li>Accès aux stakeholders clés</li></ul></div><div class="hl-box"><p>"Engage the Economic Buyer early — their buy-in early significantly reduces deal risk."</p></div></div></div></div></div>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bg" style="margin-right:7px;">03 TECH QUAL · Upside</span>Prove Impact, Clear the Path</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Identifier stakeholders techniques</li><li><div class="cb" onclick="togCb(this)"></div>Documenter exigences techniques</li><li><div class="cb" onclick="togCb(this)"></div>Prouver capacités avec PoC</li><li><div class="cb" onclick="togCb(this)"></div>Évaluer sécurité + compliance (DORA/MRM)</li><li><div class="cb" onclick="togCb(this)"></div>Finaliser Mutual Action Plan</li></ul></div><div><div class="rule"><h4>Ressources à mobiliser</h4><ul><li>Growth Specialists Security (DORA, MRM)</li><li>Value Engineering (business case CFO)</li><li>Incubation team (agentic PoC)</li><li>Pre-Sales SE aligné</li></ul></div></div></div></div></div>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bgr" style="margin-right:7px;">04 PROPOSAL · Commit</span>Present Plan, Drive Decision</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Construire quote personnalisé</li><li><div class="cb" onclick="togCb(this)"></div>Présenter avec Economic Buyer + Exec Sponsor</li><li><div class="cb" onclick="togCb(this)"></div>Finaliser MAP avec date de close</li><li><div class="cb" onclick="togCb(this)"></div>Demander customer reference</li></ul></div><div><div class="rule"><h4>Verifiable Outcomes</h4><ul><li>Confirmation écrite/verbale que UiPath est sélectionné</li><li>Scope et implémentation acceptés</li><li>Pricing et termes tentativement acceptés</li></ul></div></div></div></div></div>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bp" style="margin-right:7px;">05-06 NEGO + WON · Commit</span>Refine, Close, Deliver</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><ul class="cl"><li><div class="cb" onclick="togCb(this)"></div>Adresser objections restantes</li><li><div class="cb" onclick="togCb(this)"></div>Finaliser termes et conditions</li><li><div class="cb" onclick="togCb(this)"></div>Confirmation finale Economic Buyer</li><li><div class="cb" onclick="togCb(this)"></div>Handover Customer Success</li><li><div class="cb" onclick="togCb(this)"></div>License keys émises · Kickoff planifié</li></ul></div><div><div class="rule"><h4>Watch Out — Close dates ratées</h4><p>Souvent dues à incohérences entre quotes et POs. Rester en avance pendant la négociation.</p></div></div></div></div></div>
+  <div class="divider"></div>
+  <div class="hl-box"><p>"Prospecting Big Bets : Multi-thread until we have an outcome owner + budget holder + technical validator. Every call ends with a next step, owner, and date. Pick 3 Big Bets per account."</p></div>
+</div>
+
+<!-- FSI USE CASES -->
+<div id="tab-fsiusecases" class="panel">
+  <div class="sec-title">Use Cases <span>FSI</span></div>
+  <div class="sec-sub">Banque · Assurance · AML/FCC · Lending · Wins clients</div>
+  <span class="lbl">Banque — 3 Thèmes Executive Buying</span>
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="card" style="border-top:3px solid #5dade2;"><span class="lbl" style="color:#5dade2;">1 · HOW bank executes work</span><p style="font-weight:600;color:var(--text);font-size:12px;margin-bottom:6px;">Workforce Redesign + Agentic AI + Cost Transformation</p><ul><li>COO : 15-30% cycle time reduction</li><li>Operating Model Resilience</li><li>Execution backbone : humans/AI/systems</li></ul><div style="margin-top:8px;"><span class="badge bb">COO Owner</span></div></div>
+    <div class="card" style="border-top:3px solid var(--amber);"><span class="lbl" style="color:var(--amber);">2 · HOW bank changes and grows</span><p style="font-weight:600;color:var(--text);font-size:12px;margin-bottom:6px;">Payments Disruption + M&A Acceleration</p><ul><li>CEO : growth without fragility</li><li>Shock absorber for change</li><li>Standardize work + reduce cost</li></ul><div style="margin-top:8px;"><span class="badge ba">CEO Owner</span></div></div>
+    <div class="card" style="border-top:3px solid #e74c3c;"><span class="lbl" style="color:#e74c3c;">3 · HOW bank protects trust</span><p style="font-weight:600;color:var(--text);font-size:12px;margin-bottom:6px;">Fraud/Cyber + Regulatory Optimization</p><ul><li>CRO : license to operate</li><li>AML agents : explainability + audit trail</li><li>DORA compliance automation</li></ul><div style="margin-top:8px;"><span class="badge br">CRO/CEO Owner</span></div></div>
+  </div>
+  <span class="lbl">AML/FCC — 3 Agents Pré-construits</span>
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="card card-gold"><h3>🤖 Agent "Tara" — Payment Screening</h3><ul><li>60-80% auto-adjudication false positives</li><li>5M+ alerts/an gérés</li><li>$3M savings annuels · Near-zero error rate</li></ul><p style="font-size:10px;color:var(--text3);margin-top:7px;">Win vs "build" → time to value + model governance</p></div>
+    <div class="card card-gold"><h3>🤖 Agent "Evelyn" — Name Screening</h3><ul><li>50-70% auto-adjudication sanctions/PEP/watchlist</li><li>Ongoing monitoring customers/entities</li></ul></div>
+    <div class="card card-gold"><h3>🤖 Agent "Evan" — Adverse Media</h3><ul><li>Daily monitoring tens of millions d'entités</li><li>70%+ reviews éliminées</li><li>$11M legacy costs évités · 7x ROI</li><li>Closure consent orders + MRAs</li></ul></div>
+  </div>
+  <span class="lbl">Lending Solution</span>
+  <div class="g2" style="margin-bottom:12px;">
+    <div class="card"><h3>📋 Loan Setup Module</h3><ul><li>Réduire setup time de +50%</li><li>Surfaces underwriting blockers via LOS</li><li>Human-in-the-loop confirmation/correction</li><li>Loan Type : Home Equity (Consumer)</li></ul><span class="badge bg" style="margin-top:7px;display:inline-block;">GA 26.7</span></div>
+    <div class="card"><h3>✅ QA/QC Module</h3><ul><li>Hours → Minutes</li><li>Hundreds of quality rules across docs + systems</li><li>Auto-extract, clear clean matches, flag exceptions</li><li>Mortgage, CRE & Construction</li></ul><span class="badge bg" style="margin-top:7px;display:inline-block;">GA 26.6</span></div>
+  </div>
+  <div class="rule" style="margin-bottom:20px;"><h4>💰 Economics Lending — Mid-Cap Bank 10K loans/an</h4><p>Loan Setup : jusqu'à <strong style="color:var(--gold);">$200K ARR</strong> ($20/loan) · QA/QC : jusqu'à <strong style="color:var(--gold);">$500K ARR</strong> ($15-50/loan) · Mortgage : <strong style="color:var(--gold);">45 jours → 4 jours</strong></p></div>
+  <span class="lbl">Assurance — Use Cases Clés</span>
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="card"><h3>P&C Eligibility — Quotes & Endorsements</h3><ul><li>High-volume requests → STP auditable</li><li>KPIs : Quote cycle time ↓, STP rate %, Touches/transaction</li></ul><p style="font-size:10px;margin-top:6px;color:var(--text3);">IXP + Maestro + Robots</p></div>
+    <div class="card"><h3>Group Benefits — Claims Review</h3><ul><li>Intake → Assemble → Extract → Triage → Human</li><li>KPIs : Review cycle time, Auto-triage rate, Payment accuracy</li></ul><p style="font-size:10px;margin-top:6px;color:var(--text3);">PHI/HIPAA governance built-in</p></div>
+    <div class="card"><h3>Life Insurance — FNOD Claims</h3><ul><li><strong style="color:var(--gold);">25-40%</strong> faster time-to-pay</li><li><strong style="color:var(--gold);">2-4</strong> fewer touches/claim</li><li><strong style="color:var(--gold);">30-50%</strong> lower rework</li></ul><p style="font-size:10px;margin-top:6px;color:var(--text3);">IXP + AI Agents + Process Orchestration</p></div>
+  </div>
+  <span class="lbl">Deal Stories</span>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bgr" style="margin-right:7px;">$1.75M iARR</span>Desjardins — New Logo, 3Y, IDP + Agentic vs MSFT</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="g2"><div><div class="rule"><h4>Situation</h4><ul><li>RFP IDP + Agentic focus</li><li>MSFT comme concurrent principal</li><li>Ambitions agentic sans roadmap claire</li></ul></div></div><div><div class="rule"><h4>Clés du succès</h4><ul><li>Défini l'Agentic transaction S/M/L pour forecast</li><li>Swap rights + capacity assurance</li><li>86% discount structuré intelligemment</li></ul></div></div></div><div class="hl-box"><p>"Utility buyers don't buy components, they buy a business plan, predictable pricing and flexibility."</p></div></div></div>
+  <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bg" style="margin-right:7px;">$630K iARR</span>Voya — Test Cloud (EUC Transformation)</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Timeline (Fév → Juin 2025)</h4><ul><li>Test Suite → Test Cloud switché à mi-parcours (MacOS + self-healing requis)</li><li>EBC CTO → EBC Global COO → Close en 4 mois</li><li>Deal total : $1.577M iARR (Test Cloud + Communications Mining + Platinum)</li><li>Leçon : Attacher à un strategic transformation project</li></ul></div></div></div>
+</div>
+
+<!-- PLATFORM -->
+<div id="tab-platform" class="panel">
+  <div class="sec-title">Platform <span>& Pricing</span></div>
+  <div class="sec-sub">Architecture UiPath · Déploiement · 3 Types d'acheteurs · Platform Units</div>
+  <span class="lbl">UiPath Platform — Génération 3</span>
+  <div class="card card-gold" style="margin-bottom:16px;"><div class="g3"><div><p style="font-weight:600;color:var(--gold);margin-bottom:6px;">Solutions</p><ul><li>By Industry (FSI, Healthcare)</li><li>By Department (Office CFO)</li></ul></div><div><p style="font-weight:600;color:var(--gold);margin-bottom:6px;">Orchestration ← Le cœur</p><ul><li>Agents + People + Robots</li><li>Agentic AI · RPA · API · IDP</li></ul></div><div><p style="font-weight:600;color:var(--gold);margin-bottom:6px;">Foundation</p><ul><li>AI Trust · Data & Integration</li><li>Security & Governance</li><li>Flexible Deployment</li></ul></div></div><p style="font-size:10px;color:var(--text3);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">Ecosystem : OpenAI · Azure · AWS · SAP · Anthropic MCP · Google A2A · CrewAI · Agentforce · Snowflake · Models : GPT 4o/4.1/5.x · Claude Sonnet/Opus 4.x · Gemini 2.5</p></div>
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="card card-gold"><span class="lbl">⭐ Automation Cloud</span><p>Multi-tenant SaaS. <strong>Recommandé pour la majorité.</strong> Capabilities les plus complètes. 2 updates/mois.</p><span class="badge bgr" style="margin-top:7px;display:inline-block;">Recommandé FSI</span></div>
+    <div class="card"><span class="lbl">Automation Cloud Dedicated</span><p>SaaS dédié pour grands clients nécessitant un environnement isolé. 2 updates/mois.</p><span class="badge bb" style="margin-top:7px;display:inline-block;">Exigences données strictes</span></div>
+    <div class="card"><span class="lbl">Automation Suite</span><p>On-premise. Contrôle total. Deep IT resources. Annual updates.</p><span class="badge ba" style="margin-top:7px;display:inline-block;">Complexité maximale</span></div>
+  </div>
+  <span class="lbl">3 Types d'Acheteurs — Act II Buyers</span>
+  <div class="g3" style="margin-bottom:16px;">
+    <div class="card" style="border-top:3px solid #e74c3c;"><span class="lbl" style="color:#e74c3c;">Price Hunter</span><p style="font-style:italic;color:var(--text2);font-size:11px;margin-bottom:8px;">"Send me your Agentic rate card."</p><div class="rule"><h4>Comment gagner</h4><ul><li>Lead with enterprise readiness + TCO</li><li>Set commit expectations FIRST</li><li>Platform Units = $1 crédit universel</li><li>BYOM = per execution, not per LLM call</li></ul></div><div class="script" style="margin-top:8px;"><div class="script-lbl">Script</div><div class="script-txt">"Sure, we can get to 5 cents, but we need $1M in spend to do that."</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div></div>
+    <div class="card" style="border-top:3px solid var(--amber);"><span class="lbl" style="color:var(--amber);">In-Between Buyer</span><p style="font-style:italic;color:var(--text2);font-size:11px;margin-bottom:8px;">"What's the payback period for 3 use cases?"</p><div class="rule"><h4>Comment gagner</h4><ul><li>Restricted Unlimited → cost predictability</li><li>Swap rights → flexibility + higher commits</li><li>FLTs → prix par transaction complet</li><li>Size &amp; sell by transaction</li></ul></div></div>
+    <div class="card" style="border-top:3px solid var(--green);"><span class="lbl" style="color:var(--green);">Solution Seeker</span><p style="font-style:italic;color:var(--text2);font-size:11px;margin-bottom:8px;">"I want Agentic to save money in Claims."</p><div class="rule"><h4>Comment gagner</h4><ul><li>Position Solutions pré-construites</li><li>Lead with business case + time-to-outcome</li><li>Sell software + services ensemble</li><li>Obfuscate pricing → max margin</li></ul></div></div>
+  </div>
+  <span class="lbl">Platform Units — Tiers de consommation</span>
+  <div class="card card-gold"><p style="font-size:12px;color:var(--text2);margin-bottom:10px;">1 Platform Unit = $1 — crédit universel pour tout consumable UiPath (Agents, IXP, Maestro, API...)</p><div class="g4"><div class="rule"><h4>0 - 1M</h4><p style="font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">$0.20</p><p>par appel/page</p></div><div class="rule"><h4>1M - 5M</h4><p style="font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">$0.15</p></div><div class="rule"><h4>5M - 10M</h4><p style="font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">$0.10</p></div><div class="rule"><h4>10M+</h4><p style="font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);">$0.06</p></div></div></div>
+</div>
+
+<!-- POV BUILDER -->
+<div id="tab-pov" class="panel">
+  <div class="sec-title">POV <span>Builder</span></div>
+  <div class="sec-sub">3 étapes · Anchor Reality → Prove Tension → Quantify Impact</div>
+  <div class="card card-gold" style="margin-bottom:16px;"><p style="font-size:12px;color:var(--text2);">"Having a perspective is how we earn the right to engage at the executive level. Without a clear POV, conversations default to products — which executives delegate or disengage from." (73% of B2B buyers avoid irrelevant outreach — Gartner 2025)</p></div>
+  <div class="g2">
+    <div>
+      <span class="lbl">Step 1 — Anchor in their reality</span>
+      <textarea class="pb-ta" id="pov1" oninput="buildPOV()" style="min-height:80px;" placeholder="Thèse 1 phrase : 'You're being asked to achieve [outcome] while constrained by [risk/speed], and the current model can't scale without breaking [control].'"></textarea>
+      <span class="lbl" style="margin-top:12px;">Step 2 — Prove the tension (3 signaux + POV)</span>
+      <textarea class="pb-ta" id="pov2" oninput="buildPOV()" style="min-height:80px;" placeholder="3 signaux externes + POV : 'Winners shift from task automation to orchestrated, governed automation.'"></textarea>
+      <span class="lbl" style="margin-top:12px;">Step 3 — Quantify impact + Next step</span>
+      <textarea class="pb-ta" id="pov3" oninput="buildPOV()" style="min-height:80px;" placeholder="Impact chiffré (capacity, hard $, risk reduction) + 2-Week Value Discovery Sprint"></textarea>
+    </div>
+    <div>
+      <span class="lbl">Aperçu du POV</span>
+      <div class="pitch-prev" style="min-height:320px;"><div class="pitch-prev-title">Point of View</div><div class="pitch-prev-txt" id="pov-out"><span style="color:var(--text3);font-style:normal;font-size:11px;">Remplis les 3 étapes...</span></div><br><button class="copy-btn" style="position:static;" onclick="copyPOV()">Copier</button></div>
+      <div class="divider"></div>
+      <span class="lbl">Executive Email — Template ≤150 mots</span>
+      <div class="script"><div class="script-lbl">Template Email Exec FSI</div><div class="script-txt">Objet : [COMPTE] — une observation sur [SUJET]<br><br>[NOM],<br><br>Les FSI qui ont massivement investi en IA en 2024 constatent un même problème : l'adoption a progressé, mais les outcomes restent en retard. La raison : l'orchestration des workflows, agents et contrôles n'a pas suivi.<br><br>Pour une organisation de la taille de [COMPTE], cela représente X% de coûts évitables et un risque compliance croissant face à DORA.<br><br>Je vous propose 20 minutes pour partager ce que nous observons chez d'autres [banques / assureurs] de votre taille. Êtes-vous disponible [JOUR] ou [JOUR] ?<br><br>[Signature]</div><button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PERSONAS -->
+<div id="tab-personas" class="panel">
+  <div class="sec-title">Personas <span>FSI</span></div>
+  <div class="sec-sub">13 profils · Communs + Banque + Assurance · Angle UiPath + Use Cases</div>
+  <div class="g3">
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bg" style="margin-right:6px;">C-SUITE</span>DG / CEO ⭐⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Drivers</h4><ul><li>Compétitivité · P&L · Réputation</li></ul></div><div class="rule"><h4>Angle UiPath</h4><p>Vision transformation, ROI business. "Allez-vous lentement dans la bonne direction — ou vite dans la mauvaise ?"</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Transformation opérationnelle</li><li>Time-to-market · Efficacité coûts</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bb" style="margin-right:6px;">DIGITAL</span>CDO ⭐⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>UiPath = OS de la transformation intelligente. IA + Automation = infrastructure Data & Digital. Maestro comme chef d'orchestre des agents.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Maestro · AI Agents · Autopilot</li><li>Data pipelines · Governance modèles</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bb" style="margin-right:6px;">DIGITAL</span>DSI / CIO ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>Couche orchestration universelle sur legacy. 10 000+ connecteurs. Gouvernance enterprise-grade. Build vs Buy.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Orchestrator · Test Cloud</li><li>Integration Service · Low-code</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bg" style="margin-right:6px;">C-SUITE</span>DAF / CFO ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>Business case chiffré, ROI mesurable. L'exec peut dépenser ce qui n'est pas au budget. Ancrer par le ROI dès le départ.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Finance automation · Réconciliation</li><li>Reporting réglementaire · Cost reduction</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bb" style="margin-right:6px;">DIGITAL</span>Dir. Qualité / QA ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Persona clé Test Cloud</h4><p>Souvent non adressé par les concurrents. Souffre de cycles de recette manuels. Avantage compétitif UiPath fort.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Test Cloud · Test Suite</li><li>Self-healing · CI/CD · BDD/TDD</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge" style="background:var(--green2);color:var(--green);margin-right:6px;">MÉTIER</span>Dir. Transformation ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>Owner du programme automation. Champion naturel. Construire le CoE ensemble.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Automation Hub · Process Mining</li><li>CoE · Déploiement at scale</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge" style="background:var(--green2);color:var(--green);margin-right:6px;">MÉTIER</span>Dir. Service Client / CCO ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>Agent humain augmenté. Réduction AHT + amélioration CSAT/NPS. "Votre agent passe 40% de son temps à chercher l'info."</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Autopilot · AI Agents · Agent Assist</li><li>Traitement emails · 360° client</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bp" style="margin-right:6px;">BANQUE</span>Dir. Crédit / Origination ⭐⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Use Case #1 Banque</h4><p>Scoring crédit, traitement dossiers, KYC onboarding, analyse pièces IA, décision temps réel. "Votre délai de décision crédit est de X jours — nos clients sont à 1 jour."</p></div><div class="rule"><h4>Use Cases</h4><ul><li>AI Document Understanding · Maestro</li><li>AI Agents · KYC automatisé</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bp" style="margin-right:6px;">BANQUE</span>Dir. Conformité / RCSI ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Persona DORA & AML</h4><p>DORA entrée en vigueur. "Vos processus de contrôle interne sont-ils auditables en temps réel ?" UiPath = audit trail automatique sur chaque transaction.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>DORA compliance · AML screening</li><li>Reporting ACPR/BCE · Audit trail</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge bp" style="margin-right:6px;">BANQUE</span>Dir. Opérations Bancaires ⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Back-Office</h4><p>Paiements, réconciliation, SWIFT, settlements. "Combien d'ETP sont dédiés à la réconciliation manuelle ? Nos clients l'ont réduit de 60% en 6 mois."</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Robots · Maestro · Process Mining</li><li>Réconciliation · SWIFT · Référentiels</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge ba" style="margin-right:6px;">ASSURANCE</span>Dir. Souscription / CUO ⭐⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Use Case #2 Assurance</h4><p>Souscription auto, scoring risque, émission contrats, analyse pièces, tarification. "Votre délai de souscription est de X jours — nos clients sont à J+1."</p></div><div class="rule"><h4>Use Cases</h4><ul><li>AI Document Understanding · Maestro</li><li>AI Agents · Scoring automatisé</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge ba" style="margin-right:6px;">ASSURANCE</span>Dir. Sinistres / Claims ⭐⭐⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Use Case #1 Assurance</h4><p>Orchestration bout-en-bout sinistre. 25-40% faster time-to-pay. 2-4 fewer touches/claim. 30-50% lower rework.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>Maestro · AI Document Understanding</li><li>AI Agents · Détection fraude</li></ul></div></div></div>
+    <div class="acc"><div class="acc-h" onclick="togAcc(this)"><span><span class="badge" style="background:rgba(140,31,77,.2);color:#e91e63aa;margin-right:6px;">RISQUES</span>Dir. Risques / CRO ⭐⭐⭐</span><span class="acc-arrow">›</span></div><div class="acc-b"><div class="rule"><h4>Angle UiPath</h4><p>DORA, KYC, audit trail. Souvent veto — à adresser pour éviter le blocage. ISO 42001 certified AIMS.</p></div><div class="rule"><h4>Use Cases</h4><ul><li>KYC/AML · DORA · Contrôles internes</li><li>Test Cloud pour recette compliance</li></ul></div></div></div>
+  </div>
+</div>
+
+<!-- COACH IA -->
+<div id="tab-coach" class="panel">
+  <div class="sec-title">Coach <span>IA</span></div>
+  <div class="sec-sub">Décris ta situation · Reçois une reco personnalisée · Executive Selling + MEDDPICC + DISC + SPIN + FSI</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+
+    <!-- INPUT -->
+    <div>
+      <div class="card card-gold" style="margin-bottom:14px;">
+        <span class="lbl">Contexte du Deal</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div><label style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-bottom:4px;">COMPTE</label><select id="c-account" class="sel"><option value="">Sélectionner...</option><optgroup label="T1 · Clara"><option>Groupe VYV</option><option>MAIF</option><option>SCOR</option><option>COFACE</option><option>ODDO BHF</option><option>Malakoff Humanis</option><option>AG2R La Mondiale</option></optgroup><optgroup label="T2 · Philippe"><option>BPCE</option><option>La Banque Postale</option><option>Groupe Arkea</option></optgroup><optgroup label="T3 · Sania/Samera"><option>Groupama</option><option>Covea</option><option>BNP Paribas</option></optgroup><optgroup label="T4 · Quentin"><option>Crédit Agricole</option><option>Société Générale</option></optgroup><optgroup label="T5 · Albane"><option>AXA</option><option>AEMA Groupe</option></optgroup></select></div>
+          <div><label style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-bottom:4px;">AE</label><select id="c-ae" class="sel"><option value="">Sélectionner...</option><option>Clara (T1)</option><option>Philippe (T2)</option><option>Sania / Samera (T3)</option><option>Quentin (T4)</option><option>Albane (T5)</option></select></div>
+          <div><label style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-bottom:4px;">PERSONA</label><select id="c-persona" class="sel"><option value="">Sélectionner...</option><option>DG / CEO</option><option>CDO</option><option>DSI / CIO</option><option>DAF / CFO</option><option>COO / Dir. Opérations</option><option>Dir. Transformation</option><option>Dir. Qualité / QA</option><option>Dir. Service Client / CCO</option><option>Dir. Risques / CRO</option><option>Dir. Crédit / Origination</option><option>Dir. Conformité / RCSI</option><option>Dir. Opérations Bancaires</option><option>Dir. Souscription / CUO</option><option>Dir. Sinistres / Claims</option></select></div>
+          <div><label style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-bottom:4px;">STADE</label><select id="c-stage" class="sel"><option value="">Sélectionner...</option><option>Targeting — pas encore contacté</option><option>Power Letter envoyée</option><option>Call de relance</option><option>Avant RV1</option><option>Après RV1 — next steps</option><option>Avant RV2 présentiel</option><option>Après RV2 — engagement</option><option>Alignement opérationnel</option><option>Proposal / Negociation</option><option>Deal bloqué — relancer</option></select></div>
+        </div>
+        <label style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-bottom:5px;">PROFIL DISC</label>
+        <div class="disc-sel-row">
+          <button class="dsb dsb-D" onclick="pickDisc(this,'D')">D</button>
+          <button class="dsb dsb-I" onclick="pickDisc(this,'I')">I</button>
+          <button class="dsb dsb-S" onclick="pickDisc(this,'S')">S</button>
+          <button class="dsb dsb-C" onclick="pickDisc(this,'C')">C</button>
+          <button class="dsb dsb-X" onclick="pickDisc(this,'?')">?</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <span class="lbl">Ta situation — décris librement</span>
+        <textarea id="c-situation" class="ta-main" placeholder="Ex: J'ai eu un RV1 avec le CDO de BPCE. Il a bien accroché au pitch mais dit que le budget n'est pas prévu cette année et me renvoie vers son N-1 DSI. Je sens qu'il y a un intérêt mais il ne veut pas s'engager. Comment je relance ?"></textarea>
+        <p style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace;">⌘+Entrée pour envoyer</p>
+      </div>
+
+      <span class="lbl">Raccourcis fréquents</span>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">
+        <button class="qbtn" onclick="setQ('Comment préparer mon RV1 avec cet exec ?')">Préparer RV1</button>
+        <button class="qbtn" onclick="setQ('Il dit que c\'est pas le bon moment. Comment je réponds ?')">Objection timing</button>
+        <button class="qbtn" onclick="setQ('Il n\'a pas de budget. Que faire ?')">Objection budget</button>
+        <button class="qbtn" onclick="setQ('Comment demander l\'accès au N+1 ?')">Escalade N+1</button>
+        <button class="qbtn" onclick="setQ('Rédige-moi une Power Letter pour ce compte')">Power Letter</button>
+        <button class="qbtn" onclick="setQ('Quels sont mes gaps MEDDPICC sur ce deal ?')">Qualifier MEDDPICC</button>
+        <button class="qbtn" onclick="setQ('Quel angle d\'attaque pour ce persona ?')">Angle persona</button>
+        <button class="qbtn" onclick="setQ('Le deal est bloqué depuis 3 semaines. Comment je relance ?')">Relancer deal</button>
+        <button class="qbtn" onclick="setQ('Prépare-moi 5 questions SPIN pour ce RV')">Questions SPIN</button>
+        <button class="qbtn" onclick="setQ('Construis-moi un POV pour ce compte')">Construire POV</button>
+      </div>
+
+      <button class="ask-btn" id="ask-btn" onclick="askCoach()">✦ Obtenir la recommandation</button>
+      <button class="ask-btn" onclick="clearCoach()" style="background:var(--navy3);color:var(--text2);border:1px solid var(--border2);margin-top:6px;">Nouvelle conversation</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div>
+      <div class="coach-out">
+        <div class="coach-hdr">
+          <div class="coach-dot" id="coach-dot"></div>
+          <div class="coach-status" id="coach-status">EN ATTENTE · Décris ta situation et clique sur "Obtenir la recommandation"</div>
+        </div>
+        <div id="coach-output"><p style="color:var(--text3);font-style:italic;font-size:12px;">Le coach analysera ta situation et te donnera :<br><br>· Lecture du deal<br>· Priorité immédiate<br>· Gaps MEDDPICC<br>· Script prêt à l'emploi<br>· Questions SPIN adaptées<br>· Actions concrètes dans les 48h</p></div>
+        <button class="copy-coach-btn" id="copy-coach-btn" onclick="copyCoach()">Copier la recommandation</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+          <span class="lbl" style="margin:0;">Historique</span>
+          <button onclick="clearHistory()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:'DM Mono',monospace;">effacer</button>
+        </div>
+        <div id="coach-history" style="max-height:180px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Copié !</div>
+
+<script>
+'use strict';
+
+// ── Tab navigation ──────────────────────────────────────────────
+function showTab(btn, tab) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + tab);
+  if (panel) panel.classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Accordion ───────────────────────────────────────────────────
+function togAcc(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+// ── Checkbox ────────────────────────────────────────────────────
+function togCb(box) {
+  box.classList.toggle('chk');
+  box.textContent = box.classList.contains('chk') ? '✓' : '';
+}
+
+// ── Toast ────────────────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg || 'Copié !';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+// ── Copy script ──────────────────────────────────────────────────
+function copyScript(btn) {
+  var txt = btn.closest('.script').querySelector('.script-txt').innerText;
+  navigator.clipboard.writeText(txt).then(function() { showToast('Script copié !'); });
+}
+
+// ── Copy question ────────────────────────────────────────────────
+function copyQ(el) {
+  navigator.clipboard.writeText(el.textContent.trim()).then(function() { showToast('Question copiée !'); });
+}
+
+// ── DISC profile ─────────────────────────────────────────────────
+function showDisc(card, type) {
+  document.querySelectorAll('.dc').forEach(function(c) { c.classList.remove('sel'); });
+  document.querySelectorAll('.disc-det').forEach(function(d) { d.classList.remove('show'); });
+  card.classList.add('sel');
+  var det = document.getElementById('disc-' + type);
+  if (det) det.classList.add('show');
+}
+
+// ── MEDDPICC score ───────────────────────────────────────────────
+function setScore(dot, val) {
+  var row = dot.parentElement;
+  var dots = row.querySelectorAll('.sdot');
+  dots.forEach(function(d, i) { d.classList.toggle('filled', i < val); });
+  updateTotal();
+}
+
+function updateTotal() {
+  var total = 0;
+  document.querySelectorAll('.score-row').forEach(function(row) {
+    total += row.querySelectorAll('.sdot.filled').length;
+  });
+  var el = document.getElementById('total-score');
+  var lb = document.getElementById('score-label');
+  if (el) el.textContent = total + '/21';
+  if (lb) {
+    if (total <= 7) { lb.textContent = '⚠ Non qualifié'; lb.style.color = '#e74c3c'; }
+    else if (total <= 14) { lb.textContent = '◎ En construction'; lb.style.color = 'var(--amber)'; }
+    else if (total <= 18) { lb.textContent = '◉ Solide — accélérer'; lb.style.color = 'var(--green)'; }
+    else { lb.textContent = '✦ Béton — closer !'; lb.style.color = 'var(--gold)'; }
+  }
+}
+
+// ── Value Pitch Builder ──────────────────────────────────────────
+function buildPitch() {
+  var labels = ['CONTEXTE', 'DRAMA', 'VALUE', 'CALL TO ACTION'];
+  var ids = ['p1','p2','p3','p4'];
+  var out = document.getElementById('pitch-out');
+  var html = '';
+  ids.forEach(function(id, i) {
+    var v = (document.getElementById(id) || {}).value || '';
+    if (v.trim()) html += '<strong style="color:var(--text3);font-style:normal;font-size:10px;letter-spacing:.1em;font-family:\'DM Mono\',monospace;">' + labels[i] + '</strong><br>' + v.trim() + '<br><br>';
+  });
+  if (out) out.innerHTML = html || '<span style="color:var(--text3);font-style:normal;font-size:11px;">Remplis les 4 blocs...</span>';
+}
+
+function copyPitch() {
+  var ids = ['p1','p2','p3','p4'];
+  var text = ids.map(function(id) { return ((document.getElementById(id) || {}).value || '').trim(); }).filter(Boolean).join('\n\n');
+  navigator.clipboard.writeText(text).then(function() { showToast('Pitch copié !'); });
+}
+
+// ── POV Builder ──────────────────────────────────────────────────
+function buildPOV() {
+  var labels = ['STEP 1 — ANCHOR', 'STEP 2 — TENSION + POV', 'STEP 3 — IMPACT + NEXT STEP'];
+  var ids = ['pov1','pov2','pov3'];
+  var out = document.getElementById('pov-out');
+  var html = '';
+  ids.forEach(function(id, i) {
+    var v = (document.getElementById(id) || {}).value || '';
+    if (v.trim()) html += '<strong style="color:var(--text3);font-style:normal;font-size:10px;letter-spacing:.1em;font-family:\'DM Mono\',monospace;">' + labels[i] + '</strong><br>' + v.trim() + '<br><br>';
+  });
+  if (out) out.innerHTML = html || '<span style="color:var(--text3);font-style:normal;font-size:11px;">Remplis les 3 étapes...</span>';
+}
+
+function copyPOV() {
+  var ids = ['pov1','pov2','pov3'];
+  var text = ids.map(function(id) { return ((document.getElementById(id) || {}).value || '').trim(); }).filter(Boolean).join('\n\n');
+  navigator.clipboard.writeText(text).then(function() { showToast('POV copié !'); });
+}
+
+// ── API Key ──────────────────────────────────────────────────────
+function onKeyInput() {}
+
+function saveKey() {
+  var val = (document.getElementById('api-key-field') || {}).value || '';
+  val = val.trim();
+  var st = document.getElementById('key-status');
+  if (val.length > 10) {
+    try { localStorage.setItem('uipath_key', val); } catch(e) {}
+    if (st) { st.textContent = '⬤ Configurée ✓'; st.className = 'apikey-status status-ok'; }
+    showToast('Clé sauvegardée ✓');
+  } else {
+    try { localStorage.removeItem('uipath_key'); } catch(e) {}
+    if (st) { st.textContent = '⬤ Non configurée'; st.className = 'apikey-status status-no'; }
+  }
+}
+
+function getKey() {
+  var inp = document.getElementById('api-key-field');
+  if (inp && inp.value.trim().length > 10) return inp.value.trim();
+  try { return localStorage.getItem('uipath_key') || ''; } catch(e) { return ''; }
+}
+
+// Restore saved key on load
+(function() {
+  try {
+    var saved = localStorage.getItem('uipath_key');
+    if (saved) {
+      var inp = document.getElementById('api-key-field');
+      var st = document.getElementById('key-status');
+      if (inp) inp.value = saved;
+      if (st) { st.textContent = '⬤ Configurée ✓'; st.className = 'apikey-status status-ok'; }
+    }
+  } catch(e) {}
+})();
+
+// ── DISC Coach ───────────────────────────────────────────────────
+var selectedDISC = '?';
+function pickDisc(btn, d) {
+  document.querySelectorAll('.dsb').forEach(function(b) { b.classList.remove('picked'); });
+  btn.classList.add('picked');
+  selectedDISC = d;
+}
+
+function setQ(q) {
+  var el = document.getElementById('c-situation');
+  if (el) { el.value = q; el.focus(); }
+}
+
+// ── Coach History ────────────────────────────────────────────────
+var coachHistory = [];
+
+function addHist(q, account, stage) {
+  var hist = document.getElementById('coach-history');
+  if (!hist) return;
+  var item = document.createElement('div');
+  item.className = 'hist-item';
+  item.innerHTML = '<div class="hist-item-top">' + (account||'—') + ' · ' + (stage||'—') + '</div><div class="hist-item-q">' + q.slice(0,70) + (q.length>70?'...':'') + '</div>';
+  hist.insertBefore(item, hist.firstChild);
+}
+
+function clearHistory() {
+  coachHistory = [];
+  var h = document.getElementById('coach-history');
+  if (h) h.innerHTML = '';
+}
+
+function clearCoach() {
+  clearHistory();
+  var out = document.getElementById('coach-output');
+  if (out) out.innerHTML = '<p style="color:var(--text3);font-style:italic;font-size:12px;">Nouvelle conversation. Décris ta situation.</p>';
+  var btn = document.getElementById('copy-coach-btn');
+  if (btn) btn.style.display = 'none';
+  var st = document.getElementById('coach-status');
+  if (st) st.textContent = 'EN ATTENTE · Décris ta situation';
+  var dot = document.getElementById('coach-dot');
+  if (dot) { dot.style.background = 'var(--gold)'; dot.style.boxShadow = '0 0 7px var(--gold)'; dot.classList.remove('active'); }
+}
+
+function copyCoach() {
+  var out = document.getElementById('coach-output');
+  if (out) navigator.clipboard.writeText(out.innerText).then(function() { showToast('Recommandation copiée !'); });
+}
+
+// ── Main Coach function ──────────────────────────────────────────
+async function askCoach() {
+  var situation = ((document.getElementById('c-situation') || {}).value || '').trim();
+  if (!situation) { showToast('Décris ta situation !'); return; }
+
+  var apiKey = getKey();
+  if (!apiKey) {
+    var out = document.getElementById('coach-output');
+    if (out) out.innerHTML = '<div style="background:rgba(201,168,76,.12);border:1px solid var(--border);border-radius:8px;padding:16px;"><p style="color:var(--gold2);font-size:13px;margin-bottom:8px;"><strong>⚠ Clé API manquante</strong></p><p style="color:var(--text2);font-size:12px;">Entre ta clé Anthropic dans le bandeau <strong style="color:var(--gold);">🔑 en haut de la page</strong> et clique sur "Sauvegarder".<br><br>Tu peux en obtenir une sur <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--gold);">console.anthropic.com/settings/keys</a></p></div>';
+    return;
+  }
+
+  var account = ((document.getElementById('c-account') || {}).value || '');
+  var ae = ((document.getElementById('c-ae') || {}).value || '');
+  var persona = ((document.getElementById('c-persona') || {}).value || '');
+  var stage = ((document.getElementById('c-stage') || {}).value || '');
+
+  var btn = document.getElementById('ask-btn');
+  var dot = document.getElementById('coach-dot');
+  var status = document.getElementById('coach-status');
+  var out = document.getElementById('coach-output');
+
+  if (btn) { btn.disabled = true; btn.textContent = '✦ Analyse en cours...'; }
+  if (dot) { dot.classList.add('active'); }
+  if (status) status.textContent = 'ANALYSE EN COURS...';
+  if (out) out.innerHTML = '<p style="color:var(--text3);font-style:italic;font-size:12px;">Analyse de ta situation...</p>';
+
+  var sysPrompt = "Tu es Samera, RVP FSI chez UiPath South Europe. Tu es à la fois coach et experte. Tu maîtrises :\n- Executive Selling (tunnel d'engagement RV1/RV2, Connect/Pitch/Discuss/Engage, objections, challenger le statut quo, TUBE, POV Crafting)\n- MEDDPICC complet\n- DISC (adapter le style au profil D/I/S/C)\n- SPIN Selling (Situation/Problem/Implication/Need-Payoff)\n- Les 13 personas FSI UiPath (DG/CEO, CDO, DSI/CIO, DAF/CFO, COO, Dir. Transformation, Dir. Service Client/CCO, Dir. Risques/CRO, Dir. RH/CHRO, DTSI/VP Engineering, Dir. Qualité/QA, Dir. Crédit/Origination, Dir. Conformité/RCSI, Dir. Opérations Bancaires, Dir. Souscription/CUO, Dir. Sinistres/Claims)\n- Le territoire FSI : T1 Clara (Assurance, ARR 2.2M$), T2 Philippe (Banque, ARR 5.9M$), T3 Sania/Samera (Mixte, ARR 2.3M$), T4 Quentin (Banque, ARR 5.2M$), T5 Albane (Assurance, ARR 2.8M$)\n- Les produits UiPath : Platform, Maestro, AI Agents (Tara/Evelyn/Evan AML), Autopilot, Test Cloud/Test Suite, IXP/AI Document Understanding, Lending Solution, Process Mining, Automation Cloud/Suite\n- Le Sales Process UiPath (Discovery/Biz Qual/Tech Qual/Proposal/Negotiation/Closed Won)\n- Les 3 types d'acheteurs : Price Hunter, In-Between Buyer, Solution Seeker\n- Platform Units ($1=1 crédit universel), BYOM agents, FLTs\n- Deals de référence : Desjardins ($1.75M, IDP+Agentic vs MSFT), Manulife ($925K), Voya ($630K Test Cloud)\n\nRéponds en français. Format OBLIGATOIRE :\n**📊 Lecture du Deal**\n[2-3 phrases max]\n\n**🎯 Priorité immédiate**\n[L'action #1 à faire maintenant]\n\n**🔴 Gaps MEDDPICC**\n[2-3 dimensions critiques manquantes]\n\n**💬 Script recommandé**\n[Script verbatim prêt à l'emploi — adapté au profil DISC si connu]\n\n**❓ Questions SPIN à poser**\n[3-4 questions spécifiques]\n\n**⚡ Actions concrètes (48h)**\n[Liste courte et actionnable]\n\nSois percutant, direct, actionnable. Max 400 mots. Toujours terminer par une action dans les 48h.";
+
+  var userMsg = "Compte : " + (account||'Non précisé') + "\nAE : " + (ae||'Non précisé') + "\nPersona exec : " + (persona||'Non précisé') + "\nStade : " + (stage||'Non précisé') + "\nProfil DISC : " + selectedDISC + "\n\nSituation :\n" + situation;
+
+  coachHistory.push({ role: 'user', content: userMsg });
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sysPrompt,
+        messages: coachHistory
+      })
+    });
+
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function() { return {}; });
+      throw new Error('API Error ' + resp.status + ': ' + (errData.error && errData.error.message ? errData.error.message : resp.statusText));
+    }
+
+    var data = await resp.json();
+    var reply = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'Erreur — réessaie.';
+    coachHistory.push({ role: 'assistant', content: reply });
+
+    var formatted = reply
+      .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);">$1</strong>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    if (out) out.innerHTML = formatted;
+    if (status) status.textContent = 'RECOMMANDATION PRÊTE';
+    if (dot) { dot.classList.remove('active'); dot.style.background = 'var(--green)'; dot.style.boxShadow = '0 0 7px var(--green)'; }
+
+    var copyBtn = document.getElementById('copy-coach-btn');
+    if (copyBtn) copyBtn.style.display = 'inline-block';
+
+    addHist(situation, account, stage);
+
+    var sitEl = document.getElementById('c-situation');
+    if (sitEl) sitEl.value = '';
+
+  } catch(err) {
+    if (out) out.innerHTML = '<div style="background:var(--red2);border:1px solid rgba(192,57,43,.4);border-radius:8px;padding:14px;"><p style="color:#e74c3c;font-size:13px;margin-bottom:6px;"><strong>Erreur : ' + err.message + '</strong></p><p style="color:var(--text2);font-size:11px;">Vérifie que ta clé API est valide et que tu as accès à Internet.</p></div>';
+    if (status) status.textContent = 'ERREUR — Vérifie ta clé';
+    coachHistory.pop();
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '✦ Obtenir la recommandation'; }
+}
+
+// Cmd+Enter shortcut
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    var active = document.querySelector('.panel.active');
+    if (active && active.id === 'tab-coach') askCoach();
+  }
+});
+
+// Open first acc items
+document.querySelectorAll('.acc.open .acc-b').forEach(function(b) { b.style.display = 'block'; });
+</script>
+</body>
+</html>
